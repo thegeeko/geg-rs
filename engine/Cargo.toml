@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 winit = "0.27.5"
 spdlog-rs = "0.3.7"
+glam = "0.22.0"
