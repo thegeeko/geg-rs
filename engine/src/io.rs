@@ -185,6 +185,7 @@ pub enum Key {
   Copy,
   Paste,
   Cut,
+  Unknown,
 }
 
 pub fn to_geg_keycode(key: VirtualKeyCode) -> Key {

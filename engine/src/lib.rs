@@ -1,5 +1,5 @@
 pub mod app;
-pub mod renderer;
+pub mod backend;
 pub mod layer;
 pub mod events;
 pub mod io;
