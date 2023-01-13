@@ -13,7 +13,7 @@ pub enum GegBackend {
 
 pub struct GraphicsContext {
   device: GegVkDevice,
-  backend: GegBackend
+  backend: GegBackend,
 }
 
 impl GraphicsContext {

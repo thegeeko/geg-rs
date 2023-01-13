@@ -8,8 +8,10 @@ use vulkano::swapchain::Surface;
 use vulkano::VulkanLibrary;
 
 use spdlog::prelude::*;
-use winit::window::Window;
+use winit::window::{Window};
 
+// @TODO make generic interface
+/// describe vulkan device and a surface and it's tied to a window
 pub(crate) struct GegVkDevice {
   win: Arc<Window>,
   instance: Arc<Instance>,
@@ -105,5 +107,29 @@ impl GegVkDevice {
       queue: queues.next().unwrap(),
       win,
     }
+  }
+
+  pub fn instance(&self) -> Arc<Instance> {
+    self.instance.clone()
+  }
+
+  pub fn physical_device(&self) -> Arc<PhysicalDevice> {
+    self.physical_device.clone()
+  }
+
+  pub fn surface(&self) -> Arc<Surface> {
+    self.surface.clone()
+  }
+
+  pub fn window (&self) -> Arc<Window> {
+    self.win.clone()
+  }
+
+  pub fn device(&self) -> Arc<Device> {
+    self.device.clone()
+  }
+
+  pub fn queue(&self) -> Arc<Queue> {
+    self.queue.clone()
   }
 }
