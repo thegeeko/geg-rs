@@ -2,6 +2,7 @@
 name = "geg"
 version = "0.1.0"
 edition = "2021"
+crate-type = ["lib", "staticlib"]
 
 [dependencies]
 winit = "0.27.5"
@@ -9,3 +10,5 @@ spdlog-rs = "0.3.7"
 glam = "0.22.0"
 vulkano = "0.32.3"
 vulkano-win = "0.32.0"
+vulkano-shaders = "0.32.0"
+bytemuck = "1.12.3"

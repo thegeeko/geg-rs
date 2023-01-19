@@ -1,3 +1,4 @@
+use spdlog::debug;
 use std::sync::Arc;
 use vulkano::{
   image::view::ImageView,
@@ -6,13 +7,13 @@ use vulkano::{
 
 use super::{device::GegVkDevice, swapchain::GegVkSwapchain};
 
-pub(super) struct GegVkRenderPass {
+pub(super) struct GegVkRenderpass {
   render_pass: Arc<RenderPass>,
   frame_buffers: Vec<Arc<Framebuffer>>,
 }
 
-impl GegVkRenderPass {
-  pub fn new(geg_swapchain: GegVkSwapchain, geg_device: GegVkDevice) -> Self {
+impl GegVkRenderpass {
+  pub fn new(geg_device: GegVkDevice, geg_swapchain: GegVkSwapchain) -> Self {
     let render_pass = vulkano::single_pass_renderpass!(
       geg_device.device(),
       attachments: {
@@ -47,9 +48,20 @@ impl GegVkRenderPass {
       })
       .collect::<Vec<_>>();
 
+    debug!("Renderpass created");
+
     Self {
       render_pass,
       frame_buffers,
     }
+  }
+
+  // getters
+  pub fn render_pass(&self) -> Arc<RenderPass> {
+    self.render_pass.clone()
+  }
+
+  pub fn frame_buffers(&self) -> &Vec<Arc<Framebuffer>> {
+    &self.frame_buffers
   }
 }

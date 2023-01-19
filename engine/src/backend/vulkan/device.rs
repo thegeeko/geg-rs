@@ -3,12 +3,16 @@ use vulkano::device::physical::{PhysicalDevice, PhysicalDeviceType};
 use vulkano::device::{
   Device, DeviceCreateInfo, DeviceExtensions, Queue, QueueCreateInfo, QueueFlags,
 };
-use vulkano::instance::{Instance, InstanceCreateInfo, Version};
+use vulkano::instance::{
+  debug::{DebugUtilsMessenger, DebugUtilsMessengerCreateInfo},
+  Instance, InstanceCreateInfo, Version,
+};
+
 use vulkano::swapchain::Surface;
 use vulkano::VulkanLibrary;
 
 use spdlog::prelude::*;
-use winit::window::{Window};
+use winit::window::Window;
 
 // @TODO make generic interface
 /// describe vulkan device and a surface and it's tied to a window
@@ -19,6 +23,21 @@ pub(crate) struct GegVkDevice {
   surface: Arc<Surface>,
   device: Arc<Device>,
   queue: Arc<Queue>,
+  _debug_messenger: Option<DebugUtilsMessenger>,
+}
+
+impl Clone for GegVkDevice {
+  fn clone(&self) -> Self {
+    Self {
+      win: self.win.clone(),
+      instance: self.instance.clone(),
+      physical_device: self.physical_device.clone(),
+      surface: self.surface.clone(),
+      device: self.device.clone(),
+      queue: self.queue.clone(),
+      _debug_messenger: None,
+    }
+  }
 }
 
 impl GegVkDevice {
@@ -36,6 +55,17 @@ impl GegVkDevice {
 
     let instance =
       Instance::new(lib, instance_cration_info).expect("failed to create Vulkan instance");
+
+    // validation layers
+    let _debug_messenger = unsafe {
+      DebugUtilsMessenger::new(
+        instance.clone(),
+        DebugUtilsMessengerCreateInfo::user_callback(Arc::new(|msg| {
+          debug!("{}", msg.description);
+        })),
+      )
+      .ok()
+    };
 
     let surface = vulkano_win::create_surface_from_winit(win.clone(), instance.clone())
       .expect("failed to create surface");
@@ -97,7 +127,7 @@ impl GegVkDevice {
       },
     )
     .unwrap();
-    info!("created Vulkan device");
+    debug!("created Vulkan device");
 
     Self {
       instance,
@@ -106,6 +136,7 @@ impl GegVkDevice {
       device,
       queue: queues.next().unwrap(),
       win,
+      _debug_messenger,
     }
   }
 
@@ -121,7 +152,7 @@ impl GegVkDevice {
     self.surface.clone()
   }
 
-  pub fn window (&self) -> Arc<Window> {
+  pub fn window(&self) -> Arc<Window> {
     self.win.clone()
   }
 

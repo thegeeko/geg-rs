@@ -168,6 +168,7 @@ impl GegApp {
             let layers = &mut self.layers;
             for layer in layers.iter_mut() {
               layer.on_update(dt);
+              self.graphics_context.update();
             }
           }
 

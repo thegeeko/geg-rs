@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use winit::window::Window;
 
-use self::vulkan::device::GegVkDevice;
+use self::vulkan::{device::GegVkDevice, renderer::GegVkRenderer};
 
 mod vulkan;
 
@@ -13,14 +13,25 @@ pub enum GegBackend {
 
 pub struct GraphicsContext {
   device: GegVkDevice,
-  backend: GegBackend,
+  backend_type: GegBackend,
+  renderer: GegVkRenderer,
 }
 
 impl GraphicsContext {
-  pub fn new(backend: GegBackend, win: Arc<Window>) -> Self {
+  pub fn new(backend_type: GegBackend, win: Arc<Window>) -> Self {
+    let device = GegVkDevice::new(win);
     Self {
-      device: GegVkDevice::new(win),
-      backend
+      device: device.clone(),
+      renderer: GegVkRenderer::new(device),
+      backend_type,
     }
+  }
+
+  pub fn update(&mut self) {
+    self.renderer.render();
+  }
+
+  pub fn resize(&mut self, width: u32, height: u32) {
+    // self.device.resize(width, height);
   }
 }

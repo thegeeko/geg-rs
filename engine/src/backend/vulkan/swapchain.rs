@@ -4,8 +4,11 @@ use std::sync::Arc;
 use vulkano::format::Format;
 use vulkano::image::ImageUsage;
 use vulkano::image::SwapchainImage;
-use vulkano::swapchain::{ColorSpace, Swapchain, SwapchainCreateInfo};
+use vulkano::swapchain::{ColorSpace, Swapchain, SwapchainCreateInfo, PresentMode};
 
+use spdlog::prelude::*;
+
+#[derive(Clone)]
 pub(super) struct GegVkSwapchain {
   swapchain: Arc<Swapchain>,
   images: Vec<Arc<SwapchainImage>>,
@@ -22,17 +25,18 @@ impl GegVkSwapchain {
       .surface_capabilities(&surface, Default::default())
       .expect("failed to get surface capabilities");
 
+    let composite_alpha = caps.supported_composite_alpha.iter().next().unwrap();
+
     let avaliable_formats_colorspaces = physical_device
       .surface_formats(&surface, Default::default())
       .expect("failed to get surface formats");
 
     let (format, color_space) = *avaliable_formats_colorspaces
       .iter()
-      .filter(|fc| {
+      .find(|fc| {
         let (format, color_space) = fc;
         *format == Format::B8G8R8A8_SRGB && *color_space == ColorSpace::SrgbNonLinear
       })
-      .next()
       .unwrap_or_else(|| {
         panic!(
           "failed to find a supported format: {:?}",
@@ -41,7 +45,15 @@ impl GegVkSwapchain {
       });
 
     let dimensions = geg_device.window().inner_size();
-    let composite_alpha = caps.supported_composite_alpha.iter().next().unwrap();
+
+    let present_mode = physical_device
+      .surface_present_modes(&surface)
+      .expect("failed to get surface present modes")
+      .find(|&pm| pm == PresentMode::Mailbox)
+      .unwrap_or(PresentMode::Fifo);
+
+    info!("Present mode: {:?}", present_mode);
+
 
     let (swapchain, images) = Swapchain::new(
       geg_device.device(),
@@ -51,6 +63,7 @@ impl GegVkSwapchain {
         image_extent: dimensions.into(),
         image_format: Some(format),
         image_color_space: color_space,
+        present_mode,
         image_usage: ImageUsage {
           color_attachment: true, // What the images are going to be used for
           ..Default::default()
@@ -60,6 +73,8 @@ impl GegVkSwapchain {
       },
     )
     .unwrap();
+
+    debug!("Swapchain created");
 
     Self {
       swapchain,

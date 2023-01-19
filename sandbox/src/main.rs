@@ -40,11 +40,11 @@ impl Layer for ExampleLayer {
       },
 
       GegEvent::MouseMoved(pos) => {
-        geg::info!("Mouse moved to: {:?}", pos);
+        // geg::info!("Mouse moved to: {:?}", pos);
       }
 
       GegEvent::MouseRaw(pos) => {
-        geg::info!("Mouse raw moved to: {:?}", pos);
+        // geg::info!("Mouse raw moved to: {:?}", pos);
       }
 
       _ => (),
